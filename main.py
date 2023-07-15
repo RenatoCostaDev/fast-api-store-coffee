@@ -15,8 +15,8 @@ async def get_cofee(cafe_id: int):   # : int -> sem isso pode passar qq item, st
 
 
 @app.get('/cafe/')                               # 'http://127.0.0.1:8000/cafe/?number=1&text=capuccino' \
-async def read_cafe(number: int, text: Optional[str]):     # query parameter   # http://127.0.0.1:8000/cafe/?number=1&text=
+async def read_cafe(number: int, cafe: Optional[str]):     # query parameter   # http://127.0.0.1:8000/cafe/?number=1&cafe=
     return {
         'number': number,
-        'text': text
+        'cafe': cafe
     }
