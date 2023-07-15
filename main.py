@@ -1,22 +1,36 @@
 from fastapi import FastAPI
 from typing import Optional
+from pydantic import BaseModel # Não precisa pip install, todos os atributos e data serão herdados daqui
 
+class Coffee(BaseModel):
+    nome:str
+    tipo: str
+    descricao: Optional[str] = None
 
-app = FastAPI()                      # uvicorn main:app --reload
+app = FastAPI()
 
 @app.get('/')                           
 async def quero_cafeeee():
     return { 'quero': 'cafééééé!!!!'}
 
+# @app.post('/coffee/')
+# async def make_coffee(coffee: Coffee):
+#     return coffee
 
-@app.get('/cafe/{cafe_id}')          # path parameter
-async def get_cofee(cafe_id: int):   # : int -> sem isso pode passar qq item, str qq
-    return { 'cafe_id' : cafe_id}
+@app.post('/coffee/{nivel}')
+async def make_coffee(coffee: Coffee, nivel: int, value: bool):
+    return {**coffee.model_dump(), 'nivel': nivel, 'value': value}
 
+'''
+    return {'coffee': coffee, 'nivel': nivel, 'value': value}
 
-@app.get('/cafe/')                               # 'http://127.0.0.1:8000/cafe/?number=1&text=capuccino' \
-async def read_cafe(number: int, cafe: Optional[str]):     # query parameter   # http://127.0.0.1:8000/cafe/?number=1&cafe=
-    return {
-        'number': number,
-        'cafe': cafe
-    }
+{
+  "coffee": {
+    "nome": "3 corações",
+    "tipo": "forte",
+    "descricao": "acorda urso hibernando!!Cuidado!!"
+  },
+  "nivel": 1,
+  "value": true
+}
+'''
