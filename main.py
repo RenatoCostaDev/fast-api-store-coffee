@@ -1,45 +1,52 @@
-from fastapi import FastAPI
-from typing import Optional
-from pydantic import BaseModel # Não precisa pip install, todos os atributos e data serão herdados daqui
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel 
+from typing import Optional, List
 
-class CoffeeIn(BaseModel):
-    secret_id: int            # Não aparece na url -> http://127.0.0.1:8000/coffee/
-    nome:str
-    tipo: str
-    descricao: Optional[str] = None
+class TodoCoffee(BaseModel):
+    name: str
+    validity: str
+    description: str
 
-class Coffee(BaseModel):
-    nome:str
-    tipo: str
-    descricao: Optional[str] = None
+app = FastAPI(title='Todo coffee API')
 
-app = FastAPI()
+# CRUD (Create, Read, Update, Delete)
 
-@app.get('/')                           
-async def quero_cafeeee():
-    return { 'quero': 'cafééééé!!!!'}
+store_coffee = []
 
+@app.get('/')
+async def get_coffee():
+    return {'Quero': 'cafééééé!!!'}
 
-# @app.post('/coffee/', response_model=Coffee)
-# async def make_coffee(coffee: CoffeeIn):
-#     return coffee
+@app.post('/post-coffee/')
+async def post_coffee(todo_coffee: TodoCoffee):
+    store_coffee.append(todo_coffee)
+    return todo_coffee
 
-# @app.post('/coffee/', response_model=Coffee, response_model_include={'tipo'})
-# async def make_coffee(coffee: CoffeeIn):
-#     return coffee
+@app.get('/get-all-coffees/', response_model=List[TodoCoffee])
+async def get_all_coffee():
+    return store_coffee
 
-'''
-{
-  "tipo": "fromHell"
-}
-'''
-@app.post('/coffee/', response_model=Coffee, response_model_exclude={'tipo'})
-async def make_coffee(coffee: CoffeeIn):
-    return coffee
-
-'''
-{
-  "nome": "3 corações",
-  "descricao": "burns like hell!!"
-}
-'''
+@app.get('/get-coffee/{id}')
+async def get_coffee(id: int):
+    try:
+        return store_coffee[id]
+    except:
+        raise HTTPException(status_code=404, detail='Coffee not found')
+    
+@app.put('/update-coffee/{id}')
+async def update_coffee(id: int, coffee: TodoCoffee):
+    try:
+        store_coffee[id] = coffee
+        return store_coffee[id]
+    except:
+        raise HTTPException(status_code=404, detail='Coffee not found')
+    
+@app.delete('/delete-coffee/{id}')
+async def delete_coffee(id: int, coffee: TodoCoffee):
+    try:
+        coffee = store_coffee[id]
+        store_coffee.pop(id)
+        return coffee
+    except:
+        raise HTTPException(status_code=404, detail='Coffee not found')
+        
