@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Form
+from pydantic import BaseModel 
 
 
 app = FastAPI()
 
-@app.get('/')
-async def quero_cafeeee():
-    return { 'quero': 'cafééééé!!!!'}
+@app.post('/coffee/')
+async def form_cafeeee(name: str = Form(...), year: str = Form(...)):
+    return { 
+            'name': name,
+            'year': year,
+    } 
